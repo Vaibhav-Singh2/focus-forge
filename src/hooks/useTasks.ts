@@ -3,7 +3,9 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import type { Task } from "@/types/database.types";
 
-// Local JSON storage - no Supabase!
+// Client-side localStorage storage - works on Vercel!
+const STORAGE_KEY = "focus-forge-tasks";
+
 export type SortField =
   | "position"
   | "created_at"
@@ -29,6 +31,26 @@ interface TaskSort {
 const priorityOrder = { high: 3, medium: 2, low: 1 };
 const statusOrder = { "in-progress": 3, pending: 2, completed: 1 };
 
+// Helper functions for localStorage
+function getStoredTasks(): Task[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
+function setStoredTasks(tasks: Task[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  } catch (error) {
+    console.error("Failed to save tasks to localStorage:", error);
+  }
+}
+
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,16 +65,21 @@ export function useTasks() {
     direction: "asc",
   });
 
+  // Persist tasks to localStorage whenever they change
+  useEffect(() => {
+    if (!isLoading && tasks.length >= 0) {
+      setStoredTasks(tasks);
+    }
+  }, [tasks, isLoading]);
+
   const fetchTasks = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const res = await fetch("/api/tasks");
-      const json = await res.json();
-
-      if (json.error) throw new Error(json.error);
-      setTasks(json.data || []);
+      // Load from localStorage (client-side)
+      const storedTasks = getStoredTasks();
+      setTasks(storedTasks);
     } catch (err) {
       setError(err instanceof Error ? err : new Error("Failed to fetch tasks"));
     } finally {
@@ -68,16 +95,27 @@ export function useTasks() {
       >,
     ) => {
       try {
-        const res = await fetch("/api/tasks", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(task),
-        });
-        const json = await res.json();
+        const currentTasks = getStoredTasks();
+        const maxPosition =
+          currentTasks.length > 0
+            ? Math.max(...currentTasks.map((t) => t.position))
+            : 0;
 
-        if (json.error) throw new Error(json.error);
-        setTasks((prev) => [...prev, json.data]);
-        return { data: json.data, error: null };
+        const newTask: Task = {
+          id: crypto.randomUUID(),
+          user_id: "local-user",
+          title: task.title,
+          description: task.description || null,
+          status: task.status || "pending",
+          priority: task.priority || "medium",
+          due_date: task.due_date || null,
+          position: maxPosition + 1,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+
+        setTasks((prev) => [...prev, newTask]);
+        return { data: newTask, error: null };
       } catch (err) {
         return {
           data: null,
@@ -90,16 +128,21 @@ export function useTasks() {
 
   const updateTask = useCallback(async (id: string, updates: Partial<Task>) => {
     try {
-      const res = await fetch("/api/tasks", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, updates }),
-      });
-      const json = await res.json();
-
-      if (json.error) throw new Error(json.error);
-      setTasks((prev) => prev.map((t) => (t.id === id ? json.data : t)));
-      return { data: json.data, error: null };
+      let updatedTask: Task | null = null;
+      setTasks((prev) =>
+        prev.map((t) => {
+          if (t.id === id) {
+            updatedTask = {
+              ...t,
+              ...updates,
+              updated_at: new Date().toISOString(),
+            };
+            return updatedTask;
+          }
+          return t;
+        }),
+      );
+      return { data: updatedTask, error: null };
     } catch (err) {
       return {
         data: null,
@@ -110,10 +153,6 @@ export function useTasks() {
 
   const deleteTask = useCallback(async (id: string) => {
     try {
-      const res = await fetch(`/api/tasks?id=${id}`, { method: "DELETE" });
-      const json = await res.json();
-
-      if (json.error) throw new Error(json.error);
       setTasks((prev) => prev.filter((t) => t.id !== id));
       return { error: null };
     } catch (err) {
@@ -125,12 +164,6 @@ export function useTasks() {
 
   const bulkDelete = useCallback(async (ids: string[]) => {
     try {
-      const res = await fetch(`/api/tasks?ids=${ids.join(",")}`, {
-        method: "DELETE",
-      });
-      const json = await res.json();
-
-      if (json.error) throw new Error(json.error);
       setTasks((prev) => prev.filter((t) => !ids.includes(t.id)));
       return { error: null };
     } catch (err) {
@@ -143,16 +176,12 @@ export function useTasks() {
   const bulkUpdate = useCallback(
     async (ids: string[], updates: Partial<Task>) => {
       try {
-        const res = await fetch("/api/tasks", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ids, updates }),
-        });
-        const json = await res.json();
-
-        if (json.error) throw new Error(json.error);
         setTasks((prev) =>
-          prev.map((t) => (ids.includes(t.id) ? { ...t, ...updates } : t)),
+          prev.map((t) =>
+            ids.includes(t.id)
+              ? { ...t, ...updates, updated_at: new Date().toISOString() }
+              : t,
+          ),
         );
         return { error: null };
       } catch (err) {
@@ -165,33 +194,22 @@ export function useTasks() {
     [],
   );
 
-  const reorderTasks = useCallback(
-    async (reorderedTasks: Task[]) => {
-      try {
-        // Optimistic update
-        setTasks(reorderedTasks);
-
-        const res = await fetch("/api/tasks", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ reorder: reorderedTasks }),
-        });
-        const json = await res.json();
-
-        if (json.error) {
-          fetchTasks(); // Revert on error
-          throw new Error(json.error);
-        }
-        return { error: null };
-      } catch (err) {
-        return {
-          error:
-            err instanceof Error ? err : new Error("Failed to reorder tasks"),
-        };
-      }
-    },
-    [fetchTasks],
-  );
+  const reorderTasks = useCallback(async (reorderedTasks: Task[]) => {
+    try {
+      const tasksWithPositions = reorderedTasks.map((task, index) => ({
+        ...task,
+        position: index,
+        updated_at: new Date().toISOString(),
+      }));
+      setTasks(tasksWithPositions);
+      return { error: null };
+    } catch (err) {
+      return {
+        error:
+          err instanceof Error ? err : new Error("Failed to reorder tasks"),
+      };
+    }
+  }, []);
 
   const updateStatus = useCallback(
     async (id: string, status: "pending" | "in-progress" | "completed") => {
