@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "bun run setup && next dev",
+    "build": "bun run setup && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "setup": "node -e \"const fs=require('fs');const path=require('path');const dir=path.join(process.cwd(),'public','data');if(!fs.existsSync(dir))fs.mkdirSync(dir,{recursive:true});const file=path.join(dir,'tasks.json');if(!fs.existsSync(file))fs.writeFileSync(file,JSON.stringify({tasks:[]},null,2))\""
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
