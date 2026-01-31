@@ -1,0 +1,81 @@
+{
+  "tasks": [
+    {
+      "id": "393b65f1-86f7-44d0-a4cf-5434eae9bc11",
+      "title": "Define technical event goals and format",
+      "description": "Clarify the purpose (networking, training, product launch), target audience, event type (workshop, meetup, conference), and success metrics.",
+      "status": "pending",
+      "priority": "high",
+      "due_date": null,
+      "position": 1,
+      "created_at": "2026-01-31T08:39:39.453Z",
+      "updated_at": "2026-01-31T08:39:39.453Z"
+    },
+    {
+      "id": "1bcd1378-4ff8-45da-8361-9987e5b40434",
+      "title": "Set budget and secure venue/date",
+      "description": "Estimate costs (venue, AV, catering, speakers, swag) and confirm the event date, time, and venue (or virtual platform).",
+      "status": "pending",
+      "priority": "high",
+      "due_date": null,
+      "position": 2,
+      "created_at": "2026-01-31T08:39:39.595Z",
+      "updated_at": "2026-01-31T08:39:39.595Z"
+    },
+    {
+      "id": "ab29683d-23c3-4e97-b12c-9bb9ec7bd936",
+      "title": "Build agenda and recruit speakers",
+      "description": "Draft session topics, timing, and breaks; invite speakers/panelists; confirm talk titles, bios, and requirements.",
+      "status": "pending",
+      "priority": "high",
+      "due_date": null,
+      "position": 3,
+      "created_at": "2026-01-31T08:39:39.715Z",
+      "updated_at": "2026-01-31T08:39:39.715Z"
+    },
+    {
+      "id": "8c04d124-0963-4315-a9d1-070a98171454",
+      "title": "Arrange logistics and technical setup",
+      "description": "Plan AV/internet, microphones, recording/streaming, registration/check-in, signage, accessibility, and run-of-show responsibilities.",
+      "status": "pending",
+      "priority": "medium",
+      "due_date": null,
+      "position": 4,
+      "created_at": "2026-01-31T08:39:39.841Z",
+      "updated_at": "2026-01-31T08:39:39.841Z"
+    },
+    {
+      "id": "da4d6df4-99c5-409c-a51d-6150b5d84807",
+      "title": "Create registration and promotion plan",
+      "description": "Set up event page and ticketing/RSVP, write promo copy, schedule announcements, and coordinate with partners/communities.",
+      "status": "pending",
+      "priority": "medium",
+      "due_date": null,
+      "position": 5,
+      "created_at": "2026-01-31T08:39:40.026Z",
+      "updated_at": "2026-01-31T08:39:40.026Z"
+    },
+    {
+      "id": "18251ffd-ab80-4200-85f6-19ff8e7fd20b",
+      "title": "Finalize vendors and attendee communications",
+      "description": "Confirm catering/vendors, send attendee emails (schedule, location, parking/links, code of conduct), and prepare materials/slides template.",
+      "status": "pending",
+      "priority": "medium",
+      "due_date": null,
+      "position": 6,
+      "created_at": "2026-01-31T08:39:40.203Z",
+      "updated_at": "2026-01-31T08:39:40.203Z"
+    },
+    {
+      "id": "19efffdb-5959-4167-b631-911871c06570",
+      "title": "Run event day checklist and post-event follow-up",
+      "description": "Execute run-of-show, manage issues, collect feedback, share recordings/slides, thank speakers/sponsors, and document learnings.",
+      "status": "pending",
+      "priority": "medium",
+      "due_date": null,
+      "position": 7,
+      "created_at": "2026-01-31T08:39:40.353Z",
+      "updated_at": "2026-01-31T08:39:40.353Z"
+    }
+  ]
+}

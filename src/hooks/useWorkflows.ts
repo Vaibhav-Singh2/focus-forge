@@ -144,29 +144,58 @@ export function useWorkflows() {
 
   // Real-time subscription
   useEffect(() => {
-    const channel = supabase
-      .channel("workflows-changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "workflows" },
-        (payload) => {
-          if (payload.eventType === "INSERT") {
-            setWorkflows((prev) => [payload.new as Workflow, ...prev]);
-          } else if (payload.eventType === "UPDATE") {
-            setWorkflows((prev) =>
-              prev.map((w) =>
-                w.id === payload.new.id ? (payload.new as Workflow) : w,
-              ),
-            );
-          } else if (payload.eventType === "DELETE") {
-            setWorkflows((prev) => prev.filter((w) => w.id !== payload.old.id));
-          }
-        },
-      )
-      .subscribe();
+    let isSubscribed = true;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    const setupSubscription = async () => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user || !isSubscribed) return;
+
+        channel = supabase
+          .channel(`workflows-changes-${user.id}`)
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: "public",
+              table: "workflows",
+              filter: `user_id=eq.${user.id}`,
+            },
+            (payload) => {
+              if (!isSubscribed) return;
+
+              if (payload.eventType === "INSERT") {
+                setWorkflows((prev) => [payload.new as Workflow, ...prev]);
+              } else if (payload.eventType === "UPDATE") {
+                setWorkflows((prev) =>
+                  prev.map((w) =>
+                    w.id === payload.new.id ? (payload.new as Workflow) : w,
+                  ),
+                );
+              } else if (payload.eventType === "DELETE") {
+                setWorkflows((prev) =>
+                  prev.filter((w) => w.id !== payload.old.id),
+                );
+              }
+            },
+          )
+          .subscribe();
+      } catch {
+        // Ignore subscription errors
+      }
+    };
+
+    setupSubscription();
 
     return () => {
-      supabase.removeChannel(channel);
+      isSubscribed = false;
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, []);
 

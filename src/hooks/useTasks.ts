@@ -1,40 +1,58 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { createBrowserClient } from "@supabase/ssr";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import type { Task } from "@/types/database.types";
 
-const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
+// Local JSON storage - no Supabase!
+export type SortField =
+  | "position"
+  | "created_at"
+  | "due_date"
+  | "priority"
+  | "title"
+  | "status";
+export type SortDirection = "asc" | "desc";
+export type FilterStatus = "all" | "pending" | "in-progress" | "completed";
+export type FilterPriority = "all" | "low" | "medium" | "high";
+
+interface TaskFilters {
+  status: FilterStatus;
+  priority: FilterPriority;
+  search: string;
+}
+
+interface TaskSort {
+  field: SortField;
+  direction: SortDirection;
+}
+
+const priorityOrder = { high: 3, medium: 2, low: 1 };
+const statusOrder = { "in-progress": 3, pending: 2, completed: 1 };
 
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [filters, setFilters] = useState<TaskFilters>({
+    status: "all",
+    priority: "all",
+    search: "",
+  });
+  const [sort, setSort] = useState<TaskSort>({
+    field: "position",
+    direction: "asc",
+  });
 
   const fetchTasks = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        setError(new Error("Not authenticated"));
-        return;
-      }
+      const res = await fetch("/api/tasks");
+      const json = await res.json();
 
-      const { data, error } = await supabase
-        .from("tasks")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setTasks(data || []);
+      if (json.error) throw new Error(json.error);
+      setTasks(json.data || []);
     } catch (err) {
       setError(err instanceof Error ? err : new Error("Failed to fetch tasks"));
     } finally {
@@ -44,23 +62,22 @@ export function useTasks() {
 
   const addTask = useCallback(
     async (
-      task: Omit<Task, "id" | "user_id" | "created_at" | "updated_at">,
+      task: Omit<
+        Task,
+        "id" | "user_id" | "created_at" | "updated_at" | "position"
+      >,
     ) => {
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (!user) throw new Error("Not authenticated");
+        const res = await fetch("/api/tasks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(task),
+        });
+        const json = await res.json();
 
-        const { data, error } = await supabase
-          .from("tasks")
-          .insert({ ...task, user_id: user.id })
-          .select()
-          .single();
-
-        if (error) throw error;
-        setTasks((prev) => [data, ...prev]);
-        return { data, error: null };
+        if (json.error) throw new Error(json.error);
+        setTasks((prev) => [...prev, json.data]);
+        return { data: json.data, error: null };
       } catch (err) {
         return {
           data: null,
@@ -73,22 +90,16 @@ export function useTasks() {
 
   const updateTask = useCallback(async (id: string, updates: Partial<Task>) => {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      const res = await fetch("/api/tasks", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, updates }),
+      });
+      const json = await res.json();
 
-      const { data, error } = await supabase
-        .from("tasks")
-        .update(updates)
-        .eq("id", id)
-        .eq("user_id", user.id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      setTasks((prev) => prev.map((t) => (t.id === id ? data : t)));
-      return { data, error: null };
+      if (json.error) throw new Error(json.error);
+      setTasks((prev) => prev.map((t) => (t.id === id ? json.data : t)));
+      return { data: json.data, error: null };
     } catch (err) {
       return {
         data: null,
@@ -99,18 +110,10 @@ export function useTasks() {
 
   const deleteTask = useCallback(async (id: string) => {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      const res = await fetch(`/api/tasks?id=${id}`, { method: "DELETE" });
+      const json = await res.json();
 
-      const { error } = await supabase
-        .from("tasks")
-        .delete()
-        .eq("id", id)
-        .eq("user_id", user.id);
-
-      if (error) throw error;
+      if (json.error) throw new Error(json.error);
       setTasks((prev) => prev.filter((t) => t.id !== id));
       return { error: null };
     } catch (err) {
@@ -119,6 +122,76 @@ export function useTasks() {
       };
     }
   }, []);
+
+  const bulkDelete = useCallback(async (ids: string[]) => {
+    try {
+      const res = await fetch(`/api/tasks?ids=${ids.join(",")}`, {
+        method: "DELETE",
+      });
+      const json = await res.json();
+
+      if (json.error) throw new Error(json.error);
+      setTasks((prev) => prev.filter((t) => !ids.includes(t.id)));
+      return { error: null };
+    } catch (err) {
+      return {
+        error: err instanceof Error ? err : new Error("Failed to delete tasks"),
+      };
+    }
+  }, []);
+
+  const bulkUpdate = useCallback(
+    async (ids: string[], updates: Partial<Task>) => {
+      try {
+        const res = await fetch("/api/tasks", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids, updates }),
+        });
+        const json = await res.json();
+
+        if (json.error) throw new Error(json.error);
+        setTasks((prev) =>
+          prev.map((t) => (ids.includes(t.id) ? { ...t, ...updates } : t)),
+        );
+        return { error: null };
+      } catch (err) {
+        return {
+          error:
+            err instanceof Error ? err : new Error("Failed to update tasks"),
+        };
+      }
+    },
+    [],
+  );
+
+  const reorderTasks = useCallback(
+    async (reorderedTasks: Task[]) => {
+      try {
+        // Optimistic update
+        setTasks(reorderedTasks);
+
+        const res = await fetch("/api/tasks", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reorder: reorderedTasks }),
+        });
+        const json = await res.json();
+
+        if (json.error) {
+          fetchTasks(); // Revert on error
+          throw new Error(json.error);
+        }
+        return { error: null };
+      } catch (err) {
+        return {
+          error:
+            err instanceof Error ? err : new Error("Failed to reorder tasks"),
+        };
+      }
+    },
+    [fetchTasks],
+  );
 
   const updateStatus = useCallback(
     async (id: string, status: "pending" | "in-progress" | "completed") => {
@@ -141,56 +214,94 @@ export function useTasks() {
     fetchTasks();
   }, [fetchTasks]);
 
-  // Real-time subscription
-  useEffect(() => {
-    const channel = supabase
-      .channel("tasks-changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "tasks" },
-        (payload) => {
-          if (payload.eventType === "INSERT") {
-            setTasks((prev) => [payload.new as Task, ...prev]);
-          } else if (payload.eventType === "UPDATE") {
-            setTasks((prev) =>
-              prev.map((t) =>
-                t.id === payload.new.id ? (payload.new as Task) : t,
-              ),
-            );
-          } else if (payload.eventType === "DELETE") {
-            setTasks((prev) => prev.filter((t) => t.id !== payload.old.id));
-          }
-        },
-      )
-      .subscribe();
+  // Filtered and sorted tasks
+  const filteredTasks = useMemo(() => {
+    let result = [...tasks];
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+    // Apply filters
+    if (filters.status !== "all") {
+      result = result.filter((t) => t.status === filters.status);
+    }
+    if (filters.priority !== "all") {
+      result = result.filter((t) => t.priority === filters.priority);
+    }
+    if (filters.search) {
+      const search = filters.search.toLowerCase();
+      result = result.filter(
+        (t) =>
+          t.title.toLowerCase().includes(search) ||
+          t.description?.toLowerCase().includes(search),
+      );
+    }
 
-  const stats = {
-    total: tasks.length,
-    completed: tasks.filter((t) => t.status === "completed").length,
-    pending: tasks.filter((t) => t.status === "pending").length,
-    inProgress: tasks.filter((t) => t.status === "in-progress").length,
-    overdue: tasks.filter(
-      (t) =>
-        t.status !== "completed" &&
-        t.due_date &&
-        new Date(t.due_date) < new Date(),
-    ).length,
-  };
+    // Apply sorting
+    result.sort((a, b) => {
+      let comparison = 0;
+      switch (sort.field) {
+        case "position":
+          comparison = a.position - b.position;
+          break;
+        case "created_at":
+          comparison =
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          break;
+        case "due_date":
+          if (!a.due_date && !b.due_date) comparison = 0;
+          else if (!a.due_date) comparison = 1;
+          else if (!b.due_date) comparison = -1;
+          else
+            comparison =
+              new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+          break;
+        case "priority":
+          comparison = priorityOrder[b.priority] - priorityOrder[a.priority];
+          break;
+        case "status":
+          comparison = statusOrder[b.status] - statusOrder[a.status];
+          break;
+        case "title":
+          comparison = a.title.localeCompare(b.title);
+          break;
+      }
+      return sort.direction === "asc" ? comparison : -comparison;
+    });
+
+    return result;
+  }, [tasks, filters, sort]);
+
+  const stats = useMemo(
+    () => ({
+      total: tasks.length,
+      completed: tasks.filter((t) => t.status === "completed").length,
+      pending: tasks.filter((t) => t.status === "pending").length,
+      inProgress: tasks.filter((t) => t.status === "in-progress").length,
+      overdue: tasks.filter(
+        (t) =>
+          t.status !== "completed" &&
+          t.due_date &&
+          new Date(t.due_date) < new Date(),
+      ).length,
+    }),
+    [tasks],
+  );
 
   return {
-    tasks,
+    tasks: filteredTasks,
+    allTasks: tasks,
     stats,
     isLoading,
     error,
+    filters,
+    sort,
+    setFilters,
+    setSort,
     refetch: fetchTasks,
     addTask,
     updateTask,
     deleteTask,
+    bulkDelete,
+    bulkUpdate,
+    reorderTasks,
     toggleComplete,
     updateStatus,
   };
