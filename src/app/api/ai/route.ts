@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+// Force dynamic rendering - no caching for AI responses
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const API_KEY = process.env.AI_API_KEY;
 const MODEL = process.env.AI_MODEL || "gpt-4o-mini";
 

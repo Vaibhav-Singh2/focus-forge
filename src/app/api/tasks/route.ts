@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 // Force dynamic rendering - no caching
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 // Use public directory for accessibility in both dev and production
