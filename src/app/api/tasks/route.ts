@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
+// Force dynamic rendering - no caching
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Use public directory for accessibility in both dev and production
 const DATA_FILE = path.join(process.cwd(), "public", "data", "tasks.json");
 
