@@ -2,23 +2,113 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { signUpWithEmail, signInWithGoogle, signInWithGithub } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Frontend only - just for demo
-    console.log("Signup attempted:", { name, email, password });
+    setError(null);
+    setIsLoading(true);
+
+    // Basic password validation
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!/\d/.test(password)) {
+      setError("Password must contain at least one number");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { error } = await signUpWithEmail(email, password, name);
+      if (error) {
+        setError(error.message);
+      } else {
+        setSuccess(true);
+      }
+    } catch {
+      setError("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  const handleGoogleSignup = async () => {
+    setError(null);
+    const { error } = await signInWithGoogle();
+    if (error) {
+      setError(error.message);
+    }
+  };
+
+  const handleGithubSignup = async () => {
+    setError(null);
+    const { error } = await signInWithGithub();
+    if (error) {
+      setError(error.message);
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900 px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md"
+        >
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-zinc-200 dark:border-zinc-800 p-8 text-center">
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <svg
+                className="w-8 h-8 text-green-600 dark:text-green-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">
+              Check your email
+            </h2>
+            <p className="text-zinc-600 dark:text-zinc-400 mb-6">
+              We&apos;ve sent a confirmation link to <strong>{email}</strong>.
+              Please check your inbox and click the link to activate your
+              account.
+            </p>
+            <Button onClick={() => router.push("/login")} className="w-full">
+              Back to login
+            </Button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900 px-4">
       {/* Animated background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -48,7 +138,7 @@ export default function SignupPage() {
             href="/"
             className="flex items-center justify-center gap-2 mb-8"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
               <span className="text-white font-bold">F</span>
             </div>
             <span className="font-semibold text-xl text-zinc-900 dark:text-white">
@@ -65,6 +155,17 @@ export default function SignupPage() {
               Start your 14-day free trial
             </p>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
+            >
+              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            </motion.div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -98,8 +199,8 @@ export default function SignupPage() {
               one number.
             </p>
 
-            <Button type="submit" className="w-full">
-              Create account
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Creating account..." : "Create account"}
             </Button>
           </form>
 
@@ -136,7 +237,11 @@ export default function SignupPage() {
 
           {/* Social Login */}
           <div className="grid grid-cols-2 gap-4">
-            <Button variant="secondary" className="w-full">
+            <Button
+              variant="secondary"
+              className="w-full"
+              onClick={handleGoogleSignup}
+            >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
@@ -157,7 +262,11 @@ export default function SignupPage() {
               </svg>
               Google
             </Button>
-            <Button variant="secondary" className="w-full">
+            <Button
+              variant="secondary"
+              className="w-full"
+              onClick={handleGithubSignup}
+            >
               <svg
                 className="w-5 h-5 mr-2"
                 fill="currentColor"

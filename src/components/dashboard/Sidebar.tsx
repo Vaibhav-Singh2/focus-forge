@@ -137,7 +137,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="h-16 px-6 flex items-center border-b border-zinc-200 dark:border-zinc-800">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
             <span className="text-white font-bold text-sm">F</span>
           </div>
           <span className="font-semibold text-lg text-zinc-900 dark:text-white">
@@ -189,7 +189,7 @@ export default function Sidebar() {
 
         {/* User */}
         <div className="flex items-center gap-3 px-3 py-2.5 mt-4">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white text-sm font-medium">
+          <div className="w-8 h-8 rounded-full bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white text-sm font-medium">
             JD
           </div>
           <div className="flex-1 min-w-0">

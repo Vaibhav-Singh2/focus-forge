@@ -66,7 +66,7 @@ export default function HowItWorks() {
         {/* Steps */}
         <div className="relative">
           {/* Connection line */}
-          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-violet-500 to-indigo-600 -translate-y-1/2" />
+          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-linear-to-r from-violet-500 to-indigo-600 -translate-y-1/2" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, index) => (
@@ -81,7 +81,7 @@ export default function HowItWorks() {
                 {/* Step card */}
                 <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-700 relative z-10">
                   {/* Number badge */}
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg mb-4">
+                  <div className="w-12 h-12 rounded-full bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg mb-4">
                     {step.number}
                   </div>
                   <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">

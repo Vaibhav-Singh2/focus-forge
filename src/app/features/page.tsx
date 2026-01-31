@@ -288,7 +288,7 @@ export default function FeaturesPage() {
 
       <main className="pt-24">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-950">
+        <section className="py-20 bg-linear-to-b from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-950">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <motion.span
               initial={{ opacity: 0, y: 20 }}
@@ -345,7 +345,7 @@ export default function FeaturesPage() {
                 {category.features.map((feature) => (
                   <motion.div key={feature.title} variants={itemVariants}>
                     <Card hover className="h-full">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white mb-4">
                         {feature.icon}
                       </div>
                       <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">

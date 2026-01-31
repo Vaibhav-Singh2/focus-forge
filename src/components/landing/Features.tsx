@@ -190,7 +190,7 @@ export default function Features() {
           {features.map((feature) => (
             <motion.div key={feature.title} variants={itemVariants}>
               <Card hover className="h-full">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white mb-4">
+                <div className="w-12 h-12 rounded-xl bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white mb-4">
                   {feature.icon}
                 </div>
                 <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">

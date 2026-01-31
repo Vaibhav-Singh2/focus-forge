@@ -101,7 +101,7 @@ export default function PricingPage() {
 
       <main className="pt-24">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-950">
+        <section className="py-20 bg-linear-to-b from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-950">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <motion.span
               initial={{ opacity: 0, y: 20 }}
@@ -181,7 +181,7 @@ export default function PricingPage() {
                   }`}
                 >
                   {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-xs font-medium text-white bg-gradient-to-r from-violet-500 to-indigo-600 rounded-full">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-xs font-medium text-white bg-linear-to-r from-violet-500 to-indigo-600 rounded-full">
                       Most Popular
                     </div>
                   )}

@@ -19,7 +19,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
               <span className="text-white font-bold text-sm">F</span>
             </div>
             <span className="font-semibold text-lg text-zinc-900 dark:text-white">
@@ -50,7 +50,7 @@ export default function Navbar() {
             </Link>
             <Link
               href="/signup"
-              className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-violet-500 to-indigo-600 rounded-lg hover:from-violet-600 hover:to-indigo-700 transition-all shadow-lg shadow-violet-500/25"
+              className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-violet-500 to-indigo-600 rounded-lg hover:from-violet-600 hover:to-indigo-700 transition-all shadow-lg shadow-violet-500/25"
             >
               Get Started
             </Link>
@@ -117,7 +117,7 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/signup"
-                  className="block w-full px-4 py-2 text-sm font-medium text-center text-white bg-gradient-to-r from-violet-500 to-indigo-600 rounded-lg"
+                  className="block w-full px-4 py-2 text-sm font-medium text-center text-white bg-linear-to-r from-violet-500 to-indigo-600 rounded-lg"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Get Started

@@ -2,22 +2,57 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { signInWithEmail, signInWithGoogle, signInWithGithub } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Frontend only - just for demo
-    console.log("Login attempted:", { email, password });
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      const { error } = await signInWithEmail(email, password);
+      if (error) {
+        setError(error.message);
+      } else {
+        router.push("/dashboard");
+      }
+    } catch {
+      setError("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setError(null);
+    const { error } = await signInWithGoogle();
+    if (error) {
+      setError(error.message);
+    }
+  };
+
+  const handleGithubLogin = async () => {
+    setError(null);
+    const { error } = await signInWithGithub();
+    if (error) {
+      setError(error.message);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900 px-4">
       {/* Animated background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -47,7 +82,7 @@ export default function LoginPage() {
             href="/"
             className="flex items-center justify-center gap-2 mb-8"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
               <span className="text-white font-bold">F</span>
             </div>
             <span className="font-semibold text-xl text-zinc-900 dark:text-white">
@@ -64,6 +99,17 @@ export default function LoginPage() {
               Sign in to your account to continue
             </p>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
+            >
+              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            </motion.div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -102,8 +148,8 @@ export default function LoginPage() {
               </Link>
             </div>
 
-            <Button type="submit" className="w-full">
-              Sign in
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
 
@@ -121,7 +167,11 @@ export default function LoginPage() {
 
           {/* Social Login */}
           <div className="grid grid-cols-2 gap-4">
-            <Button variant="secondary" className="w-full">
+            <Button
+              variant="secondary"
+              className="w-full"
+              onClick={handleGoogleLogin}
+            >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
@@ -142,7 +192,11 @@ export default function LoginPage() {
               </svg>
               Google
             </Button>
-            <Button variant="secondary" className="w-full">
+            <Button
+              variant="secondary"
+              className="w-full"
+              onClick={handleGithubLogin}
+            >
               <svg
                 className="w-5 h-5 mr-2"
                 fill="currentColor"

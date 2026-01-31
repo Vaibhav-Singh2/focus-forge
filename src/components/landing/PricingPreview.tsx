@@ -107,7 +107,7 @@ export default function PricingPreview() {
                 }`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-xs font-medium text-white bg-gradient-to-r from-violet-500 to-indigo-600 rounded-full">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-xs font-medium text-white bg-linear-to-r from-violet-500 to-indigo-600 rounded-full">
                     Most Popular
                   </div>
                 )}

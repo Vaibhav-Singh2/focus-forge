@@ -12,7 +12,7 @@ const HeroBackground = dynamic(() => import("@/components/3d/HeroBackground"), {
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-white to-zinc-50 dark:from-zinc-950 dark:to-zinc-900">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-linear-to-b from-white to-zinc-50 dark:from-zinc-950 dark:to-zinc-900">
       {/* 3D Background */}
       <HeroBackground />
 
@@ -36,7 +36,7 @@ export default function Hero() {
           className="text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-900 dark:text-white mb-6 tracking-tight"
         >
           Build faster with{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-indigo-600">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-violet-500 to-indigo-600">
             AI-powered
           </span>{" "}
           tools
@@ -109,7 +109,7 @@ export default function Hero() {
       </div>
 
       {/* Gradient overlay at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-zinc-50 dark:from-zinc-900 to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-zinc-50 dark:from-zinc-900 to-transparent pointer-events-none" />
     </section>
   );
 }
