@@ -139,7 +139,7 @@ export async function toggleTaskComplete(
   // First get the current task
   const { data: task } = await supabase
     .from("tasks")
-    .select("completed")
+    .select("status")
     .eq("id", id)
     .eq("user_id", user.id)
     .single();
@@ -148,9 +148,11 @@ export async function toggleTaskComplete(
     return { data: null, error: new Error("Task not found") };
   }
 
+  const newStatus = task.status === "completed" ? "pending" : "completed";
+
   const { data, error } = await supabase
     .from("tasks")
-    .update({ completed: !task.completed })
+    .update({ status: newStatus })
     .eq("id", id)
     .eq("user_id", user.id)
     .select()
@@ -168,6 +170,7 @@ export async function getTaskStats(): Promise<{
     total: number;
     completed: number;
     pending: number;
+    inProgress: number;
     overdue: number;
   } | null;
   error: Error | null;
@@ -183,7 +186,7 @@ export async function getTaskStats(): Promise<{
 
   const { data: tasks, error } = await supabase
     .from("tasks")
-    .select("completed, due_date")
+    .select("status, due_date")
     .eq("user_id", user.id);
 
   if (error) {
@@ -193,10 +196,12 @@ export async function getTaskStats(): Promise<{
   const now = new Date();
   const stats = {
     total: tasks.length,
-    completed: tasks.filter((t) => t.completed).length,
-    pending: tasks.filter((t) => !t.completed).length,
+    completed: tasks.filter((t) => t.status === "completed").length,
+    pending: tasks.filter((t) => t.status === "pending").length,
+    inProgress: tasks.filter((t) => t.status === "in-progress").length,
     overdue: tasks.filter(
-      (t) => !t.completed && t.due_date && new Date(t.due_date) < now,
+      (t) =>
+        t.status !== "completed" && t.due_date && new Date(t.due_date) < now,
     ).length,
   };
 

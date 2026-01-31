@@ -5,6 +5,12 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Float } from "@react-three/drei";
 import * as THREE from "three";
 
+// Seeded random number generator for deterministic particle positions
+function seededRandom(seed: number) {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
 function ParticleField() {
   const meshRef = useRef<THREE.Points>(null);
   const count = 500;
@@ -14,14 +20,14 @@ function ParticleField() {
     const colors = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+      positions[i * 3] = (seededRandom(i * 3 + 1) - 0.5) * 20;
+      positions[i * 3 + 1] = (seededRandom(i * 3 + 2) - 0.5) * 20;
+      positions[i * 3 + 2] = (seededRandom(i * 3 + 3) - 0.5) * 20;
 
       // Purple to blue gradient colors
-      colors[i * 3] = 0.5 + Math.random() * 0.3; // R
-      colors[i * 3 + 1] = 0.3 + Math.random() * 0.2; // G
-      colors[i * 3 + 2] = 0.8 + Math.random() * 0.2; // B
+      colors[i * 3] = 0.5 + seededRandom(i * 6 + 4) * 0.3; // R
+      colors[i * 3 + 1] = 0.3 + seededRandom(i * 6 + 5) * 0.2; // G
+      colors[i * 3 + 2] = 0.8 + seededRandom(i * 6 + 6) * 0.2; // B
     }
 
     return { positions, colors };

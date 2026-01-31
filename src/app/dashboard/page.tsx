@@ -27,11 +27,14 @@ const priorityColors = {
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { tasks, stats, isLoading, addTask, toggleComplete, deleteTask } = useTasks();
+  const { tasks, stats, isLoading, addTask, toggleComplete, deleteTask } =
+    useTasks();
   const { profile } = useProfile();
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [newTaskPriority, setNewTaskPriority] = useState<"low" | "medium" | "high">("medium");
+  const [newTaskPriority, setNewTaskPriority] = useState<
+    "low" | "medium" | "high"
+  >("medium");
 
   const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,7 +86,10 @@ export default function DashboardPage() {
     {
       title: "Completed",
       value: stats.completed.toString(),
-      change: stats.total > 0 ? `${Math.round((stats.completed / stats.total) * 100)}%` : "0%",
+      change:
+        stats.total > 0
+          ? `${Math.round((stats.completed / stats.total) * 100)}%`
+          : "0%",
       changeType: "positive" as const,
       icon: (
         <svg
@@ -104,7 +110,10 @@ export default function DashboardPage() {
     {
       title: "In Progress",
       value: (stats.inProgress || 0).toString(),
-      change: stats.total > 0 ? `${Math.round(((stats.inProgress || 0) / stats.total) * 100)}%` : "0%",
+      change:
+        stats.total > 0
+          ? `${Math.round(((stats.inProgress || 0) / stats.total) * 100)}%`
+          : "0%",
       changeType: "neutral" as const,
       icon: (
         <svg
@@ -126,7 +135,8 @@ export default function DashboardPage() {
       title: "Overdue",
       value: stats.overdue.toString(),
       change: stats.overdue > 0 ? "Action needed" : "All good!",
-      changeType: stats.overdue > 0 ? ("negative" as const) : ("positive" as const),
+      changeType:
+        stats.overdue > 0 ? ("negative" as const) : ("positive" as const),
       icon: (
         <svg
           className="w-6 h-6"
@@ -145,7 +155,8 @@ export default function DashboardPage() {
     },
   ];
 
-  const displayName = profile?.full_name || user?.email?.split("@")[0] || "there";
+  const displayName =
+    profile?.full_name || user?.email?.split("@")[0] || "there";
 
   return (
     <div className="flex h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -162,12 +173,23 @@ export default function DashboardPage() {
                 Dashboard
               </h1>
               <p className="text-zinc-600 dark:text-zinc-400">
-                Welcome back, {displayName}! Here&apos;s what&apos;s happening today.
+                Welcome back, {displayName}! Here&apos;s what&apos;s happening
+                today.
               </p>
             </div>
             <Button onClick={() => setShowAddTask(true)}>
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
               Add Task
             </Button>
@@ -187,7 +209,9 @@ export default function DashboardPage() {
                 className="bg-white dark:bg-zinc-900 rounded-xl p-6 w-full max-w-md mx-4"
                 onClick={(e) => e.stopPropagation()}
               >
-                <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-4">Add New Task</h2>
+                <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-4">
+                  Add New Task
+                </h2>
                 <form onSubmit={handleAddTask} className="space-y-4">
                   <Input
                     label="Task Title"
@@ -202,7 +226,11 @@ export default function DashboardPage() {
                     </label>
                     <select
                       value={newTaskPriority}
-                      onChange={(e) => setNewTaskPriority(e.target.value as "low" | "medium" | "high")}
+                      onChange={(e) =>
+                        setNewTaskPriority(
+                          e.target.value as "low" | "medium" | "high",
+                        )
+                      }
                       className="w-full px-4 py-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
                     >
                       <option value="low">Low</option>
@@ -211,7 +239,11 @@ export default function DashboardPage() {
                     </select>
                   </div>
                   <div className="flex gap-3 justify-end">
-                    <Button variant="secondary" type="button" onClick={() => setShowAddTask(false)}>
+                    <Button
+                      variant="secondary"
+                      type="button"
+                      onClick={() => setShowAddTask(false)}
+                    >
                       Cancel
                     </Button>
                     <Button type="submit">Add Task</Button>
@@ -255,10 +287,22 @@ export default function DashboardPage() {
               </div>
             ) : tasks.length === 0 ? (
               <div className="p-12 text-center">
-                <svg className="w-12 h-12 mx-auto mb-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                <svg
+                  className="w-12 h-12 mx-auto mb-4 text-zinc-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
                 </svg>
-                <p className="text-zinc-500 mb-4">No tasks yet. Create your first task!</p>
+                <p className="text-zinc-500 mb-4">
+                  No tasks yet. Create your first task!
+                </p>
                 <Button onClick={() => setShowAddTask(true)}>Add Task</Button>
               </div>
             ) : (
@@ -290,7 +334,9 @@ export default function DashboardPage() {
                         className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
                       >
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`text-sm font-medium ${task.status === "completed" ? "line-through text-zinc-400" : "text-zinc-900 dark:text-white"}`}>
+                          <span
+                            className={`text-sm font-medium ${task.status === "completed" ? "line-through text-zinc-400" : "text-zinc-900 dark:text-white"}`}
+                          >
                             {task.title}
                           </span>
                         </td>
@@ -316,10 +362,24 @@ export default function DashboardPage() {
                             <button
                               onClick={() => toggleComplete(task.id)}
                               className="p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 hover:text-green-500"
-                              title={task.status === "completed" ? "Mark pending" : "Mark complete"}
+                              title={
+                                task.status === "completed"
+                                  ? "Mark pending"
+                                  : "Mark complete"
+                              }
                             >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M5 13l4 4L19 7"
+                                />
                               </svg>
                             </button>
                             <button
@@ -327,8 +387,18 @@ export default function DashboardPage() {
                               className="p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 hover:text-red-500"
                               title="Delete task"
                             >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                />
                               </svg>
                             </button>
                           </div>

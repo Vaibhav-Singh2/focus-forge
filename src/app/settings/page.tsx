@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import Sidebar from "@/components/dashboard/Sidebar";
 import DashboardHeader from "@/components/dashboard/Header";
@@ -24,23 +25,25 @@ export default function SettingsPage() {
     updateSettings,
   } = useSettings();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  // Track whether user has edited each field
+  const [nameEdited, setNameEdited] = useState(false);
+  const [localName, setLocalName] = useState("");
+
+  // Derived values: use local state if edited, otherwise use server data
+  const name = nameEdited ? localName : profile?.full_name || "";
+  const email = user?.email || "";
+
+  const setName = (value: string) => {
+    setNameEdited(true);
+    setLocalName(value);
+  };
+
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (profile) {
-      setName(profile.full_name || "");
-    }
-    if (user) {
-      setEmail(user.email || "");
-    }
-  }, [profile, user]);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,6 +59,8 @@ export default function SettingsPage() {
         type: "success",
         text: "Profile updated successfully!",
       });
+      // Reset edited state so it syncs with server data
+      setNameEdited(false);
     }
 
     setIsSaving(false);
@@ -178,9 +183,11 @@ export default function SettingsPage() {
               <form onSubmit={handleSaveProfile} className="space-y-6">
                 <div className="flex items-center gap-6">
                   {profile?.avatar_url ? (
-                    <img
+                    <Image
                       src={profile.avatar_url}
                       alt="Avatar"
+                      width={80}
+                      height={80}
                       className="w-20 h-20 rounded-full object-cover"
                     />
                   ) : (
@@ -222,7 +229,6 @@ export default function SettingsPage() {
                     type="email"
                     value={email}
                     disabled
-                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
 
