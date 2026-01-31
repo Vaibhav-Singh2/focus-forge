@@ -25,7 +25,7 @@ const steps = [
     number: "04",
     title: "Start automating",
     description:
-      "Watch as Promptly handles repetitive tasks while you focus on what matters.",
+      "Watch as Focus Forge handles repetitive tasks while you focus on what matters.",
   },
 ];
 

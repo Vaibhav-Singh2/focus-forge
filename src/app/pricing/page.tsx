@@ -10,7 +10,7 @@ import Button from "@/components/ui/Button";
 const plans = [
   {
     name: "Starter",
-    description: "Perfect for trying out Promptly",
+    description: "Perfect for trying out Focus Forge",
     monthlyPrice: 0,
     yearlyPrice: 0,
     features: [
@@ -66,7 +66,7 @@ const plans = [
 
 const faqs = [
   {
-    question: "Can I try Promptly for free?",
+    question: "Can I try Focus Forge for free?",
     answer:
       "Yes! Our Starter plan is completely free and includes up to 100 tasks per month. You can also try our Pro plan free for 14 days.",
   },

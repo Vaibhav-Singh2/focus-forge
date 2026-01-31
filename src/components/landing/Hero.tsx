@@ -48,7 +48,7 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="max-w-2xl mx-auto text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 mb-10"
         >
-          Promptly helps you streamline your workflow, automate repetitive
+          Focus Forge helps you streamline your workflow, automate repetitive
           tasks, and ship products faster than ever before.
         </motion.p>
 

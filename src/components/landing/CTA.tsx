@@ -34,7 +34,7 @@ export default function CTA() {
           className="max-w-2xl mx-auto text-lg text-violet-100 mb-10"
         >
           Join thousands of professionals who are already working smarter with
-          Promptly. Start your free trial today.
+          Focus Forge. Start your free trial today.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 20 }}

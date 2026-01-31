@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Promptly - AI-Powered Productivity Tools",
+  title: "Focus Forge - AI-Powered Productivity Tools",
   description:
     "Build faster, smarter, and more efficiently with AI-powered tools. Streamline your workflow and ship products faster than ever.",
 };

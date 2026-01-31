@@ -48,10 +48,10 @@ export default function LoginPage() {
             className="flex items-center justify-center gap-2 mb-8"
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-              <span className="text-white font-bold">P</span>
+              <span className="text-white font-bold">F</span>
             </div>
             <span className="font-semibold text-xl text-zinc-900 dark:text-white">
-              Promptly
+              Focus Forge
             </span>
           </Link>
 

@@ -10,7 +10,7 @@ const plans = [
     name: "Starter",
     price: "$0",
     period: "/month",
-    description: "Perfect for trying out Promptly",
+    description: "Perfect for trying out Focus Forge",
     features: [
       "Up to 100 tasks/month",
       "5 workflow templates",

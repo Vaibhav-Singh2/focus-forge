@@ -20,10 +20,10 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">P</span>
+              <span className="text-white font-bold text-sm">F</span>
             </div>
             <span className="font-semibold text-lg text-zinc-900 dark:text-white">
-              Promptly
+              Focus Forge
             </span>
           </Link>
 

@@ -32,10 +32,10 @@ export default function Footer() {
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-                <span className="text-white font-bold text-sm">P</span>
+                <span className="text-white font-bold text-sm">F</span>
               </div>
               <span className="font-semibold text-lg text-zinc-900 dark:text-white">
-                Promptly
+                Focus Forge
               </span>
             </Link>
             <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
@@ -67,7 +67,7 @@ export default function Footer() {
 
         <div className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            © 2026 Promptly. All rights reserved.
+            © 2026 Focus Forge. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             {/* Social Icons */}
