@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-const DATA_FILE = path.join(process.cwd(), "data", "tasks.json");
+// Use public directory for accessibility in both dev and production
+const DATA_FILE = path.join(process.cwd(), "public", "data", "tasks.json");
 
 // Ensure data directory exists
 function ensureDataDir() {
@@ -11,19 +12,30 @@ function ensureDataDir() {
     fs.mkdirSync(dir, { recursive: true });
   }
   if (!fs.existsSync(DATA_FILE)) {
-    fs.writeFileSync(DATA_FILE, JSON.stringify({ tasks: [] }));
+    fs.writeFileSync(DATA_FILE, JSON.stringify({ tasks: [] }, null, 2));
   }
 }
 
 function readTasks() {
-  ensureDataDir();
-  const data = fs.readFileSync(DATA_FILE, "utf-8");
-  return JSON.parse(data).tasks;
+  try {
+    ensureDataDir();
+    const data = fs.readFileSync(DATA_FILE, "utf-8");
+    return JSON.parse(data).tasks;
+  } catch (error) {
+    console.error("Error reading tasks:", error);
+    // Return empty array if file doesn't exist or is corrupted
+    return [];
+  }
 }
 
 function writeTasks(tasks: Task[]) {
-  ensureDataDir();
-  fs.writeFileSync(DATA_FILE, JSON.stringify({ tasks }, null, 2));
+  try {
+    ensureDataDir();
+    fs.writeFileSync(DATA_FILE, JSON.stringify({ tasks }, null, 2));
+  } catch (error) {
+    console.error("Error writing tasks:", error);
+    throw error;
+  }
 }
 
 interface Task {

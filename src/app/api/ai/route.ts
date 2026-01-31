@@ -76,7 +76,14 @@ IMPORTANT RULES:
 5. If you can't understand the command, set success: false and explain in message
 6. Keep messages friendly and concise
 7. Always return valid JSON only, no markdown or extra text
-8. Be proactive - when user asks for a plan, generate 4-7 actionable subtasks with clear titles and descriptions`;
+8. Be proactive - when user asks for a plan, generate 4-7 actionable subtasks with clear titles and descriptions
+9. PRIORITIZATION: When user asks to "prioritize", "sort by priority", "what should I focus on", "order by importance", "help me prioritize", or similar:
+   - Analyze ALL existing tasks based on: urgency (due dates), importance (keywords in title/description), and current priority
+   - Use bulk_update to SET APPROPRIATE PRIORITIES for each task (high/medium/low)
+   - Tasks with urgent deadlines or critical keywords → high priority
+   - Regular tasks → medium priority  
+   - Tasks that can wait or have "later/someday" → low priority
+   - Return a message explaining WHY you prioritized each task the way you did`;
 
 export async function POST(request: Request) {
   if (!API_KEY) {

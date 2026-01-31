@@ -426,7 +426,7 @@ export function TaskCard({
     <Reorder.Item
       value={task}
       id={task.id}
-      className={`bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 border-l-4 ${priorityColors[task.priority]} overflow-hidden ${
+      className={`bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 border-l-4 ${priorityColors[task.priority]} shadow-sm hover:shadow-md transition-shadow ${
         isSelected ? "ring-2 ring-violet-500" : ""
       }`}
     >
@@ -435,7 +435,7 @@ export function TaskCard({
           {/* Selection Checkbox */}
           <button
             onClick={() => onSelect(task.id)}
-            className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+            className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors shrink-0 ${
               isSelected
                 ? "bg-violet-600 border-violet-600 text-white"
                 : "border-zinc-300 dark:border-zinc-600 hover:border-violet-500"
@@ -461,7 +461,7 @@ export function TaskCard({
           {/* Complete Button */}
           <button
             onClick={() => onToggleComplete(task.id)}
-            className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+            className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors shrink-0 ${
               task.status === "completed"
                 ? "bg-green-500 border-green-500 text-white"
                 : "border-zinc-300 dark:border-zinc-600 hover:border-green-500"
@@ -485,7 +485,7 @@ export function TaskCard({
           </button>
 
           {/* Task Content */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 overflow-hidden">
             {isEditing ? (
               <div className="space-y-2">
                 <input
@@ -524,7 +524,7 @@ export function TaskCard({
             ) : (
               <>
                 <h3
-                  className={`font-medium text-zinc-900 dark:text-white cursor-pointer hover:text-violet-600 dark:hover:text-violet-400 ${
+                  className={`font-medium text-zinc-900 dark:text-white cursor-pointer hover:text-violet-600 dark:hover:text-violet-400 wrap-break-word ${
                     task.status === "completed"
                       ? "line-through text-zinc-400"
                       : ""
@@ -534,21 +534,44 @@ export function TaskCard({
                   {task.title}
                 </h3>
                 {task.description && (
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1.5 line-clamp-2 wrap-break-word">
                     {task.description}
                   </p>
                 )}
-                <div className="flex items-center gap-2 mt-2 flex-wrap">
+                <div className="flex items-center gap-2 mt-3 flex-wrap">
                   <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[task.status]}`}
+                    className={`px-2.5 py-1 rounded-full text-xs font-medium uppercase tracking-wide ${statusColors[task.status]}`}
                   >
                     {task.status}
                   </span>
+                  <span
+                    className={`px-2.5 py-1 rounded-full text-xs font-medium uppercase tracking-wide ${
+                      task.priority === "high"
+                        ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                        : task.priority === "medium"
+                          ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                          : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                    }`}
+                  >
+                    {task.priority}
+                  </span>
                   {task.due_date && (
                     <span
-                      className={`text-xs ${isOverdue ? "text-red-500 font-medium" : "text-zinc-500"}`}
+                      className={`text-xs flex items-center gap-1 ${isOverdue ? "text-red-500 font-medium" : "text-zinc-500 dark:text-zinc-400"}`}
                     >
-                      {isOverdue && "⚠️ "}
+                      <svg
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
                       {formatDate(task.due_date)}
                     </span>
                   )}
@@ -558,10 +581,10 @@ export function TaskCard({
           </div>
 
           {/* Actions Menu */}
-          <div className="relative">
+          <div className="relative shrink-0">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-600"
+              className="p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
             >
               <svg
                 className="w-5 h-5"
@@ -644,7 +667,7 @@ export function TaskCard({
           </div>
 
           {/* Drag Handle */}
-          <div className="cursor-grab active:cursor-grabbing p-1.5 text-zinc-400 hover:text-zinc-600">
+          <div className="cursor-grab active:cursor-grabbing p-1.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors shrink-0">
             <svg
               className="w-5 h-5"
               fill="none"
